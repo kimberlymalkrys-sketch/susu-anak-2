@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pemetaan Kesehatan Nasional - Nestlé Indonesia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8f9fa;
+            color: #333;
+        }
+        
+        .header {
+            background: #0068B4;
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 30px;
+        }
+        
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: #fff;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+        }
+        
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+        
+        .hero {
+            background: linear-gradient(135deg, #0068B4 0%, #004A87 100%);
+            padding: 80px 30px;
+            text-align: center;
+            color: #fff;
+        }
+        
+        .hero h1 {
+            font-size: 56px;
+            margin-bottom: 20px;
+        }
+        
+        .hero p {
+            font-size: 22px;
+            max-width: 900px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+            opacity: 0.95;
+        }
+        
+        .hero-stats {
+            display: flex;
+            justify-content: center;
+            gap: 60px;
+            margin-top: 50px;
+        }
+        
+        .hero-stat {
+            text-align: center;
+        }
+        
+        .hero-stat .number {
+            font-size: 48px;
+            font-weight: bold;
+            color: #7AB547;
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .hero-stat .label {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .map-section {
+            max-width: 1400px;
+            margin: -80px auto 0;
+            padding: 0 30px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .map-container {
+            background: #fff;
+            border-radius: 30px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            margin-bottom: 60px;
+        }
+        
+        .map-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+        
+        .map-header h2 {
+            font-size: 36px;
+            color: #0068B4;
+        }
+        
+        .map-filters {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .filter-btn {
+            padding: 12px 25px;
+            border: 2px solid #e0e0e0;
+            background: #fff;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        
+        .filter-btn:hover,
+        .filter-btn.active {
+            border-color: #0068B4;
+            background: #0068B4;
+            color: #fff;
+        }
+        
+        .map-visual {
+            width: 100%;
+            height: 600px;
+            background: linear-gradient(135deg, #f0f4f8, #e0e7ef);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .map-placeholder {
+            text-align: center;
+            font-size: 80px;
+            color: #ccc;
+        }
+        
+        .data-points {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .data-point {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #ff4444;
+            border-radius: 50%;
+            cursor: pointer;
+            animation: pulse 2s infinite;
+            box-shadow: 0 0 20px rgba(255,68,68,0.6);
+        }
+        
+        .data-point.stunting { background: #ff4444; }
+        .data-point.kurang-gizi { background: #ff9800; }
+        .data-point.low-risk { background: #7AB547; }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+        
+        .map-legend {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 15px;
+        }
+        
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .legend-dot {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+        }
+        
+        .legend-dot.red { background: #ff4444; }
+        .legend-dot.orange { background: #ff9800; }
+        .legend-dot.green { background: #7AB547; }
+        
+        .programs {
+            max-width: 1400px;
+            margin: 80px auto;
+            padding: 0 30px;
+        }
+        
+        .section-title {
+            font-size: 48px;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #0068B4;
+        }
+        
+        .section-subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 18px;
+            margin-bottom: 60px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .program-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-bottom: 80px;
+        }
+        
+        .program-card {
+            background: #fff;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        
+        .program-card:hover {
+            transform: translateY(-10px);
+        }
+        
+        .program-header {
+            padding: 50px;
+            background: linear-gradient(135deg, #D6357D, #FF6B35);
+            color: #fff;
+        }
+        
+        .program-header.donation {
+            background: linear-gradient(135deg, #7AB547, #5FA837);
+        }
+        
+        .program-icon {
+            font-size: 80px;
+            margin-bottom: 20px;
+        }
+        
+        .program-header h3 {
+            font-size: 36px;
+            margin-bottom: 15px;
+        }
+        
+        .program-header p {
+            font-size: 18px;
+            opacity: 0.95;
+            line-height: 1.6;
+        }
+        
+        .program-body {
+            padding: 40px 50px;
+        }
+        
+        .program-features {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+        
+        .program-features li {
+            padding: 15px 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 16px;
+            color: #666;
+        }
+        
+        .program-features li:last-child {
+            border-bottom: none;
+        }
+        
+        .program-features li:before {
+            content: "✓ ";
+            color: #7AB547;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .program-btn {
+            background: linear-gradient(135deg, #0068B4, #004A87);
+            color: #fff;
+            padding: 18px 0;
+            width: 100%;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        
+        .program-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        .donation-form {
+            background: #fff;
+            border-radius: 30px;
+            padding: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto 80px;
+        }
+        
+        .donation-options {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .donation-option {
+            padding: 25px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .donation-option:hover,
+        .donation-option.selected {
+            border-color: #7AB547;
+            background: rgba(122, 181, 71, 0.1);
+        }
+        
+        .donation-option .amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0068B4;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .donation-option .description {
+            font-size: 12px;
+            color: #666;
+        }
+        
+        .custom-amount {
+            margin-bottom: 30px;
+        }
+        
+        .custom-amount input {
+            width: 100%;
+            padding: 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 18px;
+        }
+        
+        .custom-amount input:focus {
+            outline: none;
+            border-color: #7AB547;
+        }
+        
+        .impact-section {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 80px 30px;
+        }
+        
+        .impact-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .impact-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .impact-card {
+            background: #fff;
+            padding: 40px;
+            border-radius: 25px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        
+        .impact-icon {
+            font-size: 70px;
+            margin-bottom: 20px;
+        }
+        
+        .impact-card h4 {
+            font-size: 22px;
+            margin-bottom: 15px;
+            color: #0068B4;
+        }
+        
+        .impact-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        .sponsor-section {
+            max-width: 1400px;
+            margin: 80px auto;
+            padding: 0 30px;
+        }
+        
+        .sponsor-showcase {
+            background: linear-gradient(135deg, #0068B4, #004A87);
+            border-radius: 30px;
+            padding: 60px;
+            color: #fff;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+        
+        .sponsor-text h2 {
+            font-size: 42px;
+            margin-bottom: 25px;
+        }
+        
+        .sponsor-text p {
+            font-size: 18px;
+            line-height: 1.8;
+            opacity: 0.95;
+            margin-bottom: 15px;
+        }
+        
+        .sponsor-benefits {
+            list-style: none;
+            margin-top: 30px;
+        }
+        
+        .sponsor-benefits li {
+            padding: 12px 0;
+            font-size: 16px;
+            opacity: 0.95;
+        }
+        
+        .sponsor-benefits li:before {
+            content: "⭐ ";
+            margin-right: 10px;
+        }
+        
+        .sponsor-visual {
+            text-align: center;
+        }
+        
+        .sponsor-mockup {
+            width: 100%;
+            height: 400px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 120px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .testimonials {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 0 30px;
+        }
+        
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 50px;
+        }
+        
+        .testimonial-card {
+            background: #fff;
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        
+        .testimonial-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .avatar {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #D6357D, #FF6B35);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+        }
+        
+        .testimonial-info h5 {
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .testimonial-info p {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .testimonial-text {
+            color: #666;
+            line-height: 1.7;
+            font-style: italic;
+        }
+        
+        .cta-section {
+            background: linear-gradient(135deg, #7AB547, #5FA837);
+            padding: 80px 30px;
+            text-align: center;
+            color: #fff;
+        }
+        
+        .cta-section h2 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .cta-section p {
+            font-size: 20px;
+            margin-bottom: 40px;
+            opacity: 0.95;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+        }
+        
+        .btn-white {
+            background: #fff;
+            color: #7AB547;
+            padding: 18px 50px;
+            font-size: 18px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.3s;
+        }
+        
+        .btn-white:hover {
+            transform: translateY(-3px);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            color: #fff;
+            padding: 18px 50px;
+            font-size: 18px;
+            border: 2px solid #fff;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .btn-outline:hover {
+            background: #fff;
+            color: #7AB547;
+        }
+        
+        .footer {
+            background: #333;
+            padding: 50px 30px;
+            color: #fff;
+        }
+        
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 40px;
+        }
+        
+        .footer-section h4 {
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        
+        .footer-section ul {
+            list-style: none;
+        }
+        
+        .footer-section ul li {
+            margin-bottom: 12px;
+        }
+        
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-section a:hover {
+            color: #7AB547;
+        }
+        
+        .footer-bottom {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid #555;
+            color: #999;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">Nestlé Indonesia</div>
+            <ul class="nav-links">
+                <li><a href="#beranda">Beranda</a></li>
+                <li><a href="#pemetaan">Pemetaan</a></li>
+                <li><a href="#donasi">Donasi</a></li>
+                <li><a href="#sponsorship">Sponsorship</a></li>
+                <li><a href="#tentang">Tentang</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <h1>Pemetaan Kesehatan Nasional</h1>
+        <p>Platform interaktif untuk memantau dan mengatasi masalah stunting dan kurang gizi di Indonesia. Bersama kita ciptakan generasi Indonesia yang lebih sehat dan kuat.</p>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <span class="number">21.6%</span>
+                <span class="label">Prevalensi Stunting 2023</span>
+            </div>
+            <div class="hero-stat">
+                <span class="number">4.5M</span>
+                <span class="label">Anak Terdampak</span>
+            </div>
+            <div class="hero-stat">
+                <span class="number">34</span>
+                <span class="label">Provinsi Terdata</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="map-section">
+        <div class="map-container">
+            <div class="map-header">
+                <h2>Peta Sebaran Real-Time</h2>
+                <div class="map-filters">
+                    <button class="filter-btn active">Semua</button>
+                    <button class="filter-btn">Stunting</button>
+                    <button class="filter-btn">Kurang Gizi</button>
+                    <button class="filter-btn">Daerah Prioritas</button>
+                </div>
+            </div>
+            
+            <div class="map-visual">
+                <div class="map-placeholder">🗺️</div>
+                <div class="data-points">
+                    <div class="data-point stunting" style="top: 20%; left: 15%;"></div>
+                    <div class="data-point stunting" style="top: 35%; left: 25%;"></div>
+                    <div class="data-point kurang-gizi" style="top: 45%; left: 40%;"></div>
+                    <div class="data-point stunting" style="top: 60%; left: 55%;"></div>
+                    <div class="data-point kurang-gizi" style="top: 70%; left: 65%;"></div>
+                    <div class="data-point low-risk" style="top: 25%; left: 70%;"></div>
+                    <div class="data-point stunting" style="top: 40%; left: 80%;"></div>
+                    <div class="data-point kurang-gizi" style="top: 55%; left: 30%;"></div>
+                    <div class="data-point low-risk" style="top: 30%; left: 50%;"></div>
+                    <div class="data-point stunting" style="top: 65%; left: 45%;"></div>
+                </div>
+            </div>
+            
+            <div class="map-legend">
+                <div class="legend-item">
+                    <div class="legend-dot red"></div>
+                    <span>Stunting Tinggi (>30%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot orange"></div>
+                    <span>Kurang Gizi (20-30%)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-dot green"></div>
+                    <span>Risiko Rendah (<20%)</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="programs">
+        <h2 class="section-title">Program Kami</h2>
+        <p class="section-subtitle">Dua program utama untuk memberikan dampak nyata bagi kesehatan anak Indonesia</p>
+        
+        <div class="program-grid">
+            <div class="program-card">
+                <div class="program-header donation">
+                    <div class="program-icon">❤️</div>
+                    <h3>Open Donation</h3>
+                    <p>Mari berpartisipasi dalam gerakan sosial untuk memberantas stunting bersama masyarakat Indonesia</p>
+                </div>
+                <div class="program-body">
+                    <ul class="program-features">
+                        <li>Donasi mulai dari Rp 10.000</li>
+                        <li>Transparansi penggunaan dana 100%</li>
+                        <li>Laporan dampak rutin setiap bulan</li>
+                        <li>Sertifikat donasi digital</li>
+                        <li>Update progress via email & WhatsApp</li>
+                        <li>Tax deductible untuk perusahaan</li>
+                        <li>Pilihan donasi rutin atau sekali bayar</li>
+                        <li>Dapat memilih lokasi penerima donasi</li>
+                    </ul>
+                    <button class="program-btn">Donasi Sekarang</button>
+                </div>
+            </div>
+
+            <div class="program-card">
+                <div class="program-header">
+                    <div class="program-icon">🤝</div>
+                    <h3>Program Sponsorship</h3>
+                    <p>Nestlé berkomitmen menjadi sponsor penyedia susu dan akomodasi pemeriksaan kesehatan ke daerah terpencil</p>
+                </div>
+                <div class="program-body">
+                    <ul class="program-features">
+                        <li>Distribusi KidsGrow+ gratis ke daerah prioritas</li>
+                        <li>Mobile clinic dengan dokter & ahli gizi</li>
+                        <li>Pemeriksaan kesehatan lengkap gratis</li>
+                        <li>Edukasi nutrisi untuk orang tua</li>
+                        <li>Follow-up berkala setiap 3 bulan</li>
+                        <li>Kemitraan dengan Pemerintah Daerah</li>
+                        <li>Pelatihan kader posyandu</li>
+                        <li>Monitoring tumbuh kembang digital</li>
+                    </ul>
+                    <button class="program-btn">Pelajari Lebih Lanjut</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="programs">
+        <h2 class="section-title">Mulai Donasi Anda</h2>
+        <p class="section-subtitle">Setiap rupiah Anda membuat perbedaan nyata untuk anak-anak Indonesia</p>
+        
+        <div class="donation-form">
+            <div class="donation-options">
+                <div class="donation-option">
+                    <span class="amount">50K</span>
+                    <span class="description">5 anak terbantuin</span>
+                </div>
+                <div class="donation-option selected">
+                    <span class="amount">100K</span>
+                    <span class="description">10 anak terbantuin</span>
+                </div>
+                <div class="donation-option">
+                    <span class="amount">250K</span>
+                    <span class="description">25 anak terbantuin</span>
+                </div>
+                <div class="donation-option">
+                    <span class="amount">500K</span>
+                    <span class="description">50 anak terbantuin</span>
+                </div>
+            </div>
+            
+            <div class="custom-amount">
+                <label style="display: block; margin-bottom: 10px; font-weight: 600; color: #333;">Atau masukkan nominal sendiri:</label>
+                <input type="number" placeholder="Rp 0" min="10000">
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 25px; border-radius: 15px; margin-bottom: 30px;">
+                <h4 style="margin-bottom: 15px; color: #0068B4;">Donasi Anda akan digunakan untuk:</h4>
+                <ul style="list-style: none; color: #666; line-height: 2;">
+                    <li>✓ Penyediaan susu formula KidsGrow+ gratis</li>
+                    <li>✓ Pemeriksaan kesehatan dan konsultasi ahli gizi</li>
+                    <li>✓ Edukasi nutrisi untuk orang tua</li>
+                    <li>✓ Program monitoring tumbuh kembang</li>
+                </ul>
+            </div>
+            
+            <button class="program-btn">Lanjutkan Pembayaran</button>
+            
+            <p style="text-align: center; margin-top: 20px; color: #666; font-size: 14px;">
+                🔒 Pembayaran aman & terenkripsi | Semua metode pembayaran tersedia
+            </p>
+        </div>
+    </section>
+
+    <section class="impact-section">
+        <div class="impact-content">
+            <h2 class="section-title">Dampak Nyata yang Telah Kami Ciptakan</h2>
+            <p class="section-subtitle">Bersama masyarakat dan mitra, kami telah memberikan dampak positif untuk ribuan keluarga Indonesia</p>
+            
+            <div class="impact-grid">
+                <div class="impact-card">
+                    <div class="impact-icon">👶</div>
+                    <h4>85,000+ Anak</h4>
+                    <p>Telah menerima bantuan susu formula KidsGrow+ dan pemeriksaan kesehatan gratis sejak 2024</p>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-icon">🏥</div>
+                    <h4>250+ Klinik Mobile</h4>
+                    <p>Telah menjangkau daerah terpencil di 34 provinsi dengan layanan kesehatan lengkap</p>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-icon">📊</div>
+                    <h4>18% Penurunan</h4>
+                    <p>Angka stunting di daerah program pilot kami dalam 12 bulan pertama</p>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-icon">👨‍👩‍👧‍👦</div>
+                    <h4>30,000+ Keluarga</h4>
+                    <p>Telah mendapat edukasi nutrisi dan panduan pola makan sehat untuk anak</p>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-icon">🎓</div>
+                    <h4>1,500+ Kader</h4>
+                    <p>Kader posyandu telah dilatih untuk monitoring dan edukasi gizi di komunitas</p>
+                </div>
+                <div class="impact-card">
+                    <div class="impact-icon">💝</div>
+                    <h4>Rp 12.5 Miliar</h4>
+                    <p>Total donasi yang terkumpul dari masyarakat Indonesia untuk program ini</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="sponsor-section">
+        <div class="sponsor-showcase">
+            <div class="sponsor-text">
+                <h2>Komitmen Nestlé sebagai Sponsor</h2>
+                <p>Sebagai perusahaan global yang peduli terhadap kesehatan masyarakat, Nestlé Indonesia berkomitmen untuk menjadi mitra terdepan dalam pemberantasan stunting melalui program sponsorship yang komprehensif dan berkelanjutan.</p>
+                <p>Kami tidak hanya menyediakan produk, tetapi membangun ekosistem kesehatan yang melibatkan pemerintah, masyarakat, dan sektor swasta untuk menciptakan dampak jangka panjang.</p>
+                <ul class="sponsor-benefits">
+                    <li>Distribusi 500,000+ unit KidsGrow+ per tahun ke daerah prioritas</li>
+                    <li>Investasi Rp 25 miliar untuk program kesehatan 2024-2026</li>
+                    <li>Kemitraan dengan 300+ Puskesmas & Posyandu</li>
+                    <li>Pelatihan 5,000 tenaga kesehatan dan kader</li>
+                    <li>Riset & pengembangan nutrisi khusus Indonesia</li>
+                </ul>
+            </div>
+            <div class="sponsor-visual">
+                <div class="sponsor-mockup">🏢</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials">
+        <h2 class="section-title">Testimoni Penerima Manfaat</h2>
+        <p class="section-subtitle">Kisah nyata dari keluarga yang telah merasakan dampak positif program kami</p>
+        
+        <div class="testimonial-grid">
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <div class="avatar">👩</div>
+                    <div class="testimonial-info">
+                        <h5>Ibu Siti Rahayu</h5>
+                        <p>Orang Tua, NTT</p>
+                    </div>
+                </div>
+                <p class="testimonial-text">"Alhamdulillah, setelah 6 bulan rutin mengonsumsi KidsGrow+ dan kontrol ke klinik mobile Nestlé, anak saya yang tadinya stunting sekarang berat dan tinggi badannya sudah sesuai standar. Terima kasih Nestlé!"</p>
+            </div>
+            
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <div class="avatar">👨</div>
+                    <div class="testimonial-info">
+                        <h5>Bapak Ahmad</h5>
+                        <p>Kepala Desa, Papua</p>
+                    </div>
+                </div>
+                <p class="testimonial-text">"Program ini sangat membantu masyarakat desa kami yang jauh dari fasilitas kesehatan. Tim Nestlé tidak hanya membawa susu, tapi juga edukasi yang membuka wawasan kami tentang pentingnya nutrisi."</p>
+            </div>
+            
+            <div class="testimonial-card">
+                <div class="testimonial-header">
+                    <div class="avatar">👩</div>
+                    <div class="testimonial-info">
+                        <h5>Dr. Wulandari</h5>
+                        <p>Dokter Puskesmas, Maluku</p>
+                    </div>
+                </div>
+                <p class="testimonial-text">"Kolaborasi dengan Nestlé sangat membantu kami menjangkau lebih banyak anak. Platform pemetaan mereka juga mempermudah kami dalam monitoring dan evaluasi program stunting di wilayah kami."</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <h2>Mari Bergabung dalam Gerakan Ini</h2>
+        <p>Setiap kontribusi Anda, sekecil apapun, membuat perbedaan besar untuk masa depan anak-anak Indonesia. Bersama kita ciptakan generasi yang lebih sehat, kuat, dan cerdas.</p>
+        <div class="cta-buttons">
+            <button class="btn-white">Mulai Donasi</button>
+            <button class="btn-outline">Jadi Volunteer</button>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Nestlé Indonesia</h4>
+                <p style="color: #ccc; line-height: 1.6; font-size: 14px;">
+                    Bersama menciptakan Good food, Good life untuk seluruh rakyat Indonesia.
+                </p>
+            </div>
+            <div class="footer-section">
+                <h4>Program</h4>
+                <ul>
+                    <li><a href="#">Pemetaan Kesehatan</a></li>
+                    <li><a href="#">Open Donation</a></li>
+                    <li><a href="#">Program Sponsorship</a></li>
+                    <li><a href="#">KidsGrow+</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Tentang</h4>
+                <ul>
+                    <li><a href="#">Tentang Kami</a></li>
+                    <li><a href="#">Laporan Transparansi</a></li>
+                    <li><a href="#">Mitra Kami</a></li>
+                    <li><a href="#">Karir</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Hubungi Kami</h4>
+                <ul>
+                    <li><a href="#">📞 0800-1-360-000</a></li>
+                    <li><a href="#">📧 csr@nestle.co.id</a></li>
+                    <li><a href="#">📍 Jakarta, Indonesia</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Nestlé Indonesia. All Rights Reserved. | Good food, Good life.</p>
+        </div>
+    </footer>
+</body>
+</html>
